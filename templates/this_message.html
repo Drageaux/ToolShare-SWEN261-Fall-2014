@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}{{this_message.subject}}{% endblock %}
+
+{% block content %}
+<style type="text/css">
+	body {
+		background: #e0e0e0;
+		word-break: break-all
+	}
+	
+	.message_display{
+    	margin: 40px;
+    }
+	
+	.content {
+		margin: 0 auto;
+		padding: 20px 40px 20px 40px;
+		width: 71%;
+		background: white;
+	}
+	
+	#reply {
+		margin-left: 15px;
+		
+	}
+	
+	p {
+		margin-left: 15px;
+	}
+</style>
+<div class="content">
+	<div class="message_display">
+		<div class="form-inline">
+			<div class="col-sm3">
+				<label for="toolname" class="col-sm-2 control-label">From: </label>
+				{{this_message.sender.user.username}}
+			</div>
+		</div>
+		<br>
+		<div class="form-inline">
+			<div class="col-sm3">
+				<label for="subject" class="col-sm-2 control-label">Subject: </label>
+				{% if this_message.subject != "" %}
+					{{this_message.subject}}
+				{% else %}
+					N/A
+				{% endif %}
+			</div>
+		</div>
+		<br>
+		<div class="form-inline">
+		  <div class="col-sm3">
+				<label for="message_body" class="col-sm-2 control-label">Message: </label>
+				{% if this_message.message_body != "" %}
+					<p>{{this_message.message_body}}</p>
+				{% else %}
+					N/A
+				{% endif %}
+		  </div>
+		</div>
+		<br>
+		<br>
+		<a href="http://127.0.0.1:8000/new_message/" id="reply" class="btn btn-primary">Reply</a>
+		<a href="/delete_message/{{ this_message.id }}/{{ this_message.in_inbox }}/" class="btn btn-primary">Delete</a>
+		<a href="/archive_message/{{ this_message.id }}/{{ this_message.in_inbox }}/" class="btn btn-primary">Archive</a>
+	</div>
+</div>
+
+
+{% endblock %}

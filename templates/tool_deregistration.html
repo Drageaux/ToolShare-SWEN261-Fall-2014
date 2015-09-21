@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Successful Tool Creation</title>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<style type="text/css">
+    .background{
+    	margin: 40px;
+    }
+	
+	#center {
+		text-align: center;
+		margin: 0 auto;
+		padding: 20px;
+		width: 30%;
+		height: 100%;
+	}
+	
+	#controls {
+		text-align: center;
+		margin: 0 auto;
+		padding: 20px;
+		width: 50%;
+		height: 100%;
+	}
+	
+	#yes {
+		float: left;
+		margin-left: 30px;
+		padding: 0 5px 0 5px;
+		width: 40px;
+	}
+	
+	#no {
+		float: right;
+		margin-right: 30px;
+		padding: 0 5px 0 5px;
+		width: 40px;
+	}
+	
+</style>
+</head>
+
+<body>
+	<div class="background">
+		<div id="side">
+			<!--Stuff to put in the side area-->
+		</div>
+		
+		<div class="alert alert-warning" role="alert" id="center">
+			<!--Stuff to put in the center area-->
+			<h4>Deregistration Confirmation</h4>
+			<p>Are you sure you want to delete this Tool?</p>
+			<!--
+			<a href="/deregistering_tool/{{tool.id}}">Yes</a>
+			<a href="/tool/{{tool.id}}">No</a>
+			-->
+			<div id="controls">
+				<form action="/deregistering_tool/{{tool.id}}" method="post">
+					{% csrf_token %}
+					<button class="btn btn-primary" id="yes" role="button" name="yes" value="{{tool.id}}">Yes</button>
+				</form>
+				
+				<form action="/tool/{{tool.id}}" method="post">
+					{% csrf_token %}
+					<button class="btn btn-primary" id="no" role="button" name="no" value="{{tool.id}}">No</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
+

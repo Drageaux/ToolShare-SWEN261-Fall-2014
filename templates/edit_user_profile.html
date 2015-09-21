@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit User Profile{% endblock %}
+
+{% block content %}
+<style type="text/css">
+	body {
+		background: #e0e0e0;
+	}
+	
+	.edit_profile{
+		margin: 0 auto;
+		padding: 10px 20px 10px 20px;
+		width: 71%;
+		background: white;
+    }
+	
+	.content {
+		margin: 40px;
+		padding: 0px;
+	}
+	
+	#save_button {
+		margin: 10px 0 0 15px;
+		
+	}
+</style>
+<div class="edit_profile">
+	<div class="content">
+		<form action="/edit_user_profile_auth/" method="post">
+			{% csrf_token %}
+			<div class="form-inline">
+				<label for="inputEmail" class="col-sm-2 control-label">Email*</label>
+				<div class="col-sm10">
+					<input type="email" value="{{email_input}}" maxlength="25" size="25" class="form-control" name="email" id="inputEmail" required>
+				</div>
+			</div>
+			<br>
+			<div class="form-inline">
+				<label for="inputFirstName" class="col-sm-2 control-label">First Name*</label>
+				<div class="col-sm10">
+					<input value="{{first_name_input}}" maxlength="25" size="25" class="form-control" name="firstname" id="inputFirstName" required pattern="^[A-Z][a-z]*">
+				</div>
+			</div>
+			<br>
+			<div class="form-inline">
+				<label for="inputLastName" class="col-sm-2 control-label">Last Name*</label>
+				<div class="col-sm10">
+					<input value="{{last_name_input}}" maxlength="25" size="25" class="form-control" name="lastname" id="inputLastName" required pattern="^[A-Z][a-z]*">
+				</div>
+			</div>
+			<br>
+			<div class="form-inline">
+				<label for="inputPhoneNumber" class="col-sm-2 control-label">Phone Number*</label>
+				<div class="col-sm10">
+					<input type="tel" value="{{phonenumber_input}}" maxlength="10" size="10" class="form-control" onkeypress="return isNumberKey(event)" name="phonenumber" id="inputPhoneNumber" required pattern="[0-9]+">
+				</div>
+			</div>
+			<br>
+			<div class="form-inline">
+				<label for="inputStreet" class="col-sm-2 control-label">Street*</label>
+				<div class="col-sm10">
+					<input value="{{street_input}}" maxlength="25" size="25" class="form-control" name="street_address" id="inputStreet" required pattern="^[a-zA-Z0-9]+([\s][a-zA-Z0-9]+)*$">
+				</div>
+			</div>
+			<br>
+			<div class="form-inline">
+				<label for="inputCity" class="col-sm-2 control-label">City*</label>
+				<div class="col-sm10">
+					<input value="{{city_input}}" maxlength="15" size="15" class="form-control" name="city" id="inputCity" required pattern="^[A-Z][a-z]*">
+				</div>
+			</div>
+			<br>
+			<div class="form-inline">
+				<label for="inputState" class="col-sm-2 control-label">State*</label>
+				<select name="state" class="form-control input-md">
+					{% for state in list_of_states %}
+						{% if state == state_input %}
+							<option value={{state}} selected>{{state}}</option>
+						{% else %}
+							<option value={{state}}>{{state}}</option>
+						{% endif %}
+					{% endfor %}
+				</select>
+			</div>
+			<br>	
+			<div class="form-inline">
+				<label for="inputZipcode" class="col-sm-2 control-label">Zipcode*</label>
+				<div class="col-sm10">
+					<input value="{{zipcode_input}}" maxlength="5" size="5" class="form-control" name="zipcode" onkeypress="return isNumberKey(event)" id="inputZipcode" required pattern="[0-9]+.{4,}">
+				</div>
+			</div>
+			<br>
+			<div class="form-inline">
+				<label for="birthdate" class="col-sm-2 control-label">Birthday*</label>
+				<div class="form-inline">
+					<div id="choose">
+						<select name="birthmonth" id="birthmonth_dropdown" class="form-control input-md">
+							{% for i in range_months %}
+								{% if i == selected_month %}
+									<option value={{i}} selected>{{i}}</option>
+								{% else %}
+									<option value={{i}}>{{i}}</option>
+								{% endif %}
+							{% endfor %}
+						</select>
+						<select name="birthday" id="birthday_dropdown" class="form-control input-md">
+							{% for i in range_days %}
+								{% if i == selected_day %}
+									<option value={{i}} selected>{{i}}</option>
+								{% else %}
+									<option value={{i}}>{{i}}</option>
+								{% endif %}
+							{% endfor %}
+						</select>
+						<select name="birthyear" id="birthyear_dropdown" class="form-control input-md">
+							{% for i in range_years %}
+								{% if i == selected_year %}
+									<option value={{i}} selected>{{i}}</option>
+								{% else %}
+									<option value={{i}}>{{i}}</option>
+								{% endif %}
+							{% endfor %}
+						</select>
+						{% if error_message|length != 0 and error_message == "Please select a valid date."%}
+							&nbsp<font size="2"color="red"><i>{{ error_message }}</i></font>
+						{% endif %}
+					</div>
+				</div>	
+			</div>
+			<script>
+			function isNumberKey(evt){
+				var charCode = (evt.which) ? evt.which : event.keyCode
+				if (charCode > 31 && (charCode < 48 || charCode > 57))
+					return false;
+				return true;
+			}    
+			</script>
+			<br>
+			<input type="submit" class="btn btn-primary" id="save_button" role="button" value="Save">
+		</form>
+	</div>
+</div>
+{% endblock %}

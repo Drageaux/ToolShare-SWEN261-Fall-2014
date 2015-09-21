@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Create New Message{% endblock %}
+
+{% block content %}
+<style type="text/css">
+    body {
+		background: #e0e0e0;
+	}
+	
+	.new_message {
+    	margin: 0 auto;
+		padding: 20px 40px 20px 40px;
+		width: 71%;
+		background: white;
+    }
+	
+	#subject input {
+		margin-left: 15px;
+	}
+	
+	#message textarea {
+		margin-left: 15px;
+	}
+	
+	#choose select {
+		width: 200%;
+	}
+	
+	#content {
+		margin: 0 auto;
+		width: 50%;
+	}
+
+</style>
+<div class="new_message">
+	<form action="/register_message" method="post">
+		{% csrf_token %}
+		<div id="content">
+			<strong>To:</strong>
+			<br>
+			<div id="choose" class="col-sm-5">
+				<select id="receiverDropDown" class="form-control input-md" name="receiver" >
+					{% for user in user_query_results %}
+						<option value={{user.id}} selected>{{user.user.first_name}} {{user.user.last_name}} ({{user.user.username}})</option>
+					{% endfor %}
+				</select>
+			</div>
+			<br>
+			<br>
+			<br>
+			<div id="subject">
+				<div class="form-group">
+					<label for="subject">Subject:</label>
+					<br>
+					<input type="subject" maxlength="50" class="form-control" id="subject" name="subject" placeholder="Subject">
+				</div>
+			</div>
+			<br>
+			<div id="message">
+				<div class="form-group">
+					<label for="message_body">Message:</label>
+					<br>
+					<textarea type="message_body" class="form-control" maxlength="1000" id="message_body" name="message_body" placeholder="Text" rows="15"></textarea>
+				</div>
+			</div>
+			<div id="submit">
+				<br>
+				<input type="submit" class="btn btn-primary" role="button" value="Send">
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+{% endblock %}

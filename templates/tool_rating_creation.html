@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Rate this Transaction{% endblock %}
+
+{% block content %}
+<style type="text/css">
+    body {
+		background: #e0e0e0;
+	}
+	
+	.tool_rating_creation{
+    	margin: 0 auto;
+		padding: 20px;
+		width: 80%;
+		background: white;
+    }
+</style>
+<div class="tool_rating_creation">
+<div class="tool_display">
+		<div class="form-inline">
+			<div class="col-sm3">
+				<label for="toolname" class="col-sm-2 control-label">Tool Name: </label>
+				{{this_tool.name}}
+			</div>
+		</div>
+		<br>
+		<div class="form-inline">
+		  <div class="col-sm3">
+				<label for="description" class="col-sm-2 control-label">Description: </label>
+				{% if this_tool.description != "" %}
+					{{this_tool.description}}
+				{% else %}
+					N/A
+				{% endif %}
+		  </div>
+		</div>
+		<br>
+		<div class="form-inline">
+			<div class="col-sm3">
+				<label for="modelnumber" class="col-sm-2 control-label">Model Number: </label>
+				{% if this_tool.model_number != "" %}
+					{{this_tool.model_number}}
+				{% else %}
+					N/A
+				{% endif %}
+			</div>
+		</div>
+		<br>
+		<div class="form-inline">
+			<div class="col-sm3">
+				<label for="condition" class="col-sm-2 control-label">Condition: </label>
+				{{this_tool.condition}}
+			</div>
+		</div>
+		<br>
+		<div class="form-inline">
+			<div class="col-sm3">
+				<label for="owner" class="col-sm-2 control-label">Owner: </label>
+				<a>{{owner.first_name}} {{owner.last_name}}</a>
+			</div>
+		</div>
+	</div>
+	
+	<form action="/register_tool" method="post">
+		{% csrf_token %}
+		
+		<div class="form-inline">
+			<label for="preCondition" class="col-sm-2 control-label">Condition Before Transaction:</label>
+			<select class="form-control input-lg" name="preCondition">
+				<option value="5">New</option>
+				<option value="4">Good</option>
+				<option value="3">Average</option>
+				<option value="2">Worn</option>
+				<option value="1">Damaged</option>
+				<option value="0">Destroyed</option>
+			</select>
+		</div>
+		
+		<div class="form-inline">
+			<label for="postCondition" class="col-sm-2 control-label">Condition After Transaction:</label>
+			<select class="form-control input-lg" name="postCondition">
+				<option value="5">New</option>
+				<option value="4">Good</option>
+				<option value="3">Average</option>
+				<option value="2">Worn</option>
+				<option value="1">Damaged</option>
+				<option value="0">Destroyed</option>
+			</select>
+		</div>
+		
+		<div class="form-inline">
+			<label for="postCondition" class="col-sm-2 control-label">On a scale from 1 to 10 how would you rate this Transaction?</label>
+			<select class="form-control input-lg" name="postCondition">
+				<option value="10">10</option>
+				<option value="9">9</option>
+				<option value="8">8</option>
+				<option value="7">7</option>
+				<option value="6">6</option>
+				<option value="5">5</option>
+				<option value="4">4</option>
+				<option value="3">3</option>
+				<option value="2">2</option>
+				<option value="1">1</option>
+				<option value="0">0</option>
+			</select>
+		</div>
+		
+		<br>
+		<div class="form-inline">
+			  <label class="col-sm-2 control-label" for="toolcomment">Any Comments?</label>
+			  <div class="col-sm10">
+				<textarea class="form-control" maxlength="500" id="toolcomment" name="toolcomment" placeholder="comments . . . " rows="10"></textarea>
+			  </div>
+		</div>
+		<br>
+		<input type="submit" class="btn btn-primary" role="button" value="Send">
+	</form>
+</div>
+{% endblock %}

@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<style type="text/css">
+	body {
+		background: #e0e0e0;
+	}
+	
+	.my_tools, .borrowed_tools, .sharezone_requests, .user_requests, .transactions{
+    	padding: 0px 30px 0px 30px;
+    }
+	
+	.user_info li {
+		list-style-type: none;
+	}
+	
+	.user_info h2, h3 {
+		margin-left: 30px;
+	}
+	
+	.user_info {
+		margin: 0;
+		padding: 0;
+	}
+	
+	.page-header {
+		margin: 30px;
+	}
+	
+	#createToolButton {
+		float: right;
+		padding-top: 20px;
+	}
+	
+	#toolHeader {
+		float: left;
+	}
+	
+	#content {
+		margin: 0 auto;
+		padding: 10px 20px 10px 20px;
+		width: 71%;
+		background: white;
+	}
+</style>
+<div id="content">
+	<div class = "user_info">
+		{% if tuser.is_super_admin %}
+			<h1 class="page-header">{{tuser.user.first_name}} {{tuser.user.last_name}} (Super Admin)</h1>
+		{% else %}
+			{% if tuser.is_admin %}
+				<h1 class="page-header">{{tuser.user.first_name}} {{tuser.user.last_name}} (Admin)</h1>
+			{% else %}
+				<h1 class="page-header">{{tuser.user.first_name}} {{tuser.user.last_name}}</h1>
+			{% endif %}
+		{% endif %}
+		<ul>
+			<li><strong>Birthdate:</strong> {{tuser.birth_date}}</li>
+			<li><strong>Email:</strong> {{tuser.user.email}}</li>
+			<li><strong>Phone:</strong> {{tuser.phone_number}}</li>
+			<li><strong>Address:</strong> {{tuser.street}}, {{tuser.city}}, {{tuser.state}}</li>
+			<li><strong>Zipcode:</strong> {{tuser.zipcode}}</li>
+		</ul>
+	</div>
+
+	{% if tuser.is_super_admin and not sharezone_query_results|length = 0 %}
+	<div class="sharezone_requests">
+		<h2 id="sharezoneRequestHeader">ShareZone Requests <font size="3"><span title="Someone wants to create a ShareZone. Click accept to allow the user to become an Admin and create that ShareZone." class="glyphicon glyphicon-info-sign" aria-hidden="false"></span></font></h2>
+		<table class="table table-striped" data-toggle="table">
+			<thead>
+				<tr>
+					<th data-valign="middle">ShareZone</th>
+					<th class="col-md-1"></th>
+					<th class="col-md-1"></th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for sz in sharezone_query_results %}
+					<tr>
+						<td>
+							<a href="/sharezone/{{ sz.id }}">{{ sz.name }}</a>
+						</td>
+						<td>
+							<a href="/inactive_sharezone/{{ sz.id }}">
+								<button class="btn btn-primary">
+									<span class="glyphicon glyphicon-ok">
+										<font face="arial">Accept</font>
+									</span>
+								</button>
+							</a> 
+						</td>
+						<td>						
+							<a href="/decline_sharezone/{{ sz.id }}">
+								<button class="btn btn-primary">
+									<span class="glyphicon glyphicon-remove"> 
+										<font face="arial">Decline</font>
+									</span>
+								</button>
+							</a>
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+		<br>
+		<br>
+	</div>
+	{% endif %}
+	
+	{% if tuser.is_admin and not user_query_results|length = 0 %}
+	<div class="user_requests">
+		<h2 id="userRequestHeader">User Requests <font size="3"><span title="Someone wants to join your ShareZone. Click accept to allow new members." class="glyphicon glyphicon-info-sign" aria-hidden="false"></span></font></h2>
+		<table class="table table-striped" data-toggle="table">
+			<thead>
+				<tr>
+					<th data-valign="middle">User</th>
+					<th class="col-md-1"></th>
+					<th class="col-md-1"></th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for tu in user_query_results %}
+					{% if not tu.is_declined %}
+					<tr>
+						<td>
+							<a href="/user/{{tu.user.id}}">{{ tu.user.first_name }} {{ tu.user.last_name }}</a>
+						</td>
+						<td>
+							<a href="/inactive_user/{{ tu.id }}">
+								<button class="btn btn-primary">
+									<span class="glyphicon glyphicon-ok"> 
+										<font face="arial">Accept</font>
+									</span>
+								</button>
+							</a>
+						</td>
+						<td>
+							<a href="/decline_user/{{ tu.id }}">
+								<button class="btn btn-primary">
+									<span class="glyphicon glyphicon-remove">
+										<font face="arial">Decline</font>
+									</span>
+								</button>
+							</a>
+						</td>
+					</tr>
+					{% endif %}
+				{% endfor %}
+			</tbody>
+		</table>
+		<br>
+		<br>
+	</div>
+	{% endif %}
+	
+	<div class="my_tools">
+		<h2 id="toolHeader">My Tools</h2>
+		<form action="/create_tool/" id="createToolButton" method="post">
+			{% csrf_token %}
+			<div>
+				<input type="submit" class="btn btn-primary" role="button" value="Create a Tool">
+			</div>
+		</form>
+		<br>
+		<table class="table table-striped" data-toggle="table" data-pagination="true">
+			<thead>
+				<tr>
+					<th>Tool</th>
+					<th>Condition</th>
+					<th>Description</th>
+					<th>Current User</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for tool in tool_query_results %}
+					{% if tool.owner_id == tuser.id %}
+					<tr>
+						<td><a href="/tool/{{tool.id}}">{{ tool.name }}</a> {% if tool.is_in_shed %} (Shared in Shed) {% endif %}</td>
+						<td>
+							{% if tool.condition == "5" %}New
+							{% elif tool.condition == "4" %}Good
+							{% elif tool.condition == "3" %}Average
+							{% elif tool.condition == "2" %}Worn
+							{% elif tool.condition == "1" %}Damaged
+							{% elif tool.condition == "0" %}Destroyed	
+							{% endif %}
+						</td>
+						<td>{{ tool.description }}</td>
+						{% if tool.current_user_id == tuser.id %}
+							<td><a href="/user/{{tool.current_user.user.id}}">{{tool.current_user.user.first_name}} {{tool.current_user.user.last_name}}</a> (Me)</td>
+						{% else %}
+							<td><a href="/user/{{tool.current_user.user.id}}">{{tool.current_user.user.first_name}} {{tool.current_user.user.last_name}}</a></td>
+						{% endif %}
+					</tr>
+					{% endif %}
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+
+	<div class="borrowed_tools">
+		<h2>Borrowed Tools</h2>
+		<table class="table table-striped" data-toggle="table" data-pagination="true">
+			<thead>
+				<tr>
+					<th>Tool</th>
+					<th>Condition</th>
+					<th>Description</th>
+					<th>Owner</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for tool in tool_query_results %}
+					{% if tool.owner_id != tool.current_user_id %}
+						{% if tool.current_user_id == tuser.id %}
+							<tr>
+								<td><a href="/tool/{{tool.id}}">{{ tool.name }}</a></td>
+								<td>
+									{% if tool.condition == "5" %}New
+									{% elif tool.condition == "4" %}Good
+									{% elif tool.condition == "3" %}Average
+									{% elif tool.condition == "2" %}Worn
+									{% elif tool.condition == "1" %}Damaged
+									{% elif tool.condition == "0" %}Destroyed	
+									{% endif %}
+								</td>
+								<td>{{ tool.description }}</td>
+								<td><a href="/user/{{tool.owner.user.id}}">{{tool.owner.user.first_name}} {{tool.owner.user.last_name}}</a></td>
+							</tr>
+						{% endif %}
+					{% endif %}
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+	<!--
+	<div class="transactions">
+		<h2 id="toolHeader">Transactions</h2>
+		<table class="table table-striped" data-toggle="table" data-pagination="true">
+			<thead>
+				<tr>
+					<th>Event</th>
+					<th>Location</th>
+					<th>Rating</th>
+					<th>Description</th>
+					<th>Start Date</th>
+					<th>End Date</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for transaction in transaction_query_results %}
+					{% if transaction.owner_id == tuser.id or transaction.borrower_id == tuser.id %}
+						{% if transaction.returned == True %}
+							<tr>
+								<td>
+									{% for user in all_user_query_results %}
+										{% if user.id == transaction.borrower_id %}
+											{% if tuser.id == transaction.borrower_id %}
+											You
+											{% else %}
+											<a href="/user/{{user.id}}">{{user.user.first_name}} {{user.user.last_name}}</a>
+											{% endif %}
+										{% endif %}
+									{% endfor %}
+									
+									borrowed 
+									<a href="/tool/{{transaction.tool_id}}">
+										{% for tool in tool_query_results%}
+											{% if tool.id == transaction.tool_id %}
+												{{ tool.name }}
+											{% endif %}
+										{% endfor %}
+									</a> 
+									from 
+									
+									{% for user in all_user_query_results %}
+										{% if user.id == transaction.owner_id %}
+											{% if tuser.id == transaction.owner_id %}
+											you.
+											{% else %}
+											<a href="/user/{{user.id}}">{{user.user.first_name}} {{user.user.last_name}}</a>
+											{% endif %}
+										{% endif %}
+									{% endfor %}
+								</td>
+								<td>{% if transaction.shed_id != None %} Shed {% else %} Home {% endif %}</td>
+								<td>{{ transaction.rating }} </td>
+								<td>{{ transaction.description }}</td>
+								<td>{{ transaction.start_date }}</td>
+								<td>{{ transaction.end_date }}</td>
+							</tr>
+						{% endif %}
+					{% endif %}
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+	-->
+</div>
+{% endblock %}

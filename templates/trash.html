@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Trash{% endblock %}
+
+{% block content %}
+<style type="text/css">
+   body {
+		background: #e0e0e0;
+	}
+	
+	.trash {
+		margin: 0 auto;
+		padding: 20px 40px 20px 40px;
+		width: 71%;
+		background: white;
+	}
+	
+	#messageHeader {
+		float: left;
+		margin-bottom: 40px;
+	}
+
+</style>
+<div class="trash">
+    <h2>Trash</h2>
+		<table class="table table-striped" data-toggle="table" data-pagination="true">
+			<thead>
+				<tr>
+					<th data-valign="middle" class="col-md-4">Sender</th>
+					<th data-valign="middle">Subject</th>
+					<th class="col-md-1"></th>
+					<th class="col-md-1"></th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for message in measles %}
+					{% if id == message.receiver_id %}
+						<tr>
+							{% for user in user_query_results %}
+								{% if user.id == message.sender_id %}
+									<td><a href="/user/{{user.id}}">{{user.user.first_name}} {{user.user.last_name}} ({{user.user.username}})</a></td>
+									<td>
+										{% if message.subject|length == 0 %}
+											(No Subject)
+										{% else %}
+											{{ message.subject }}
+										{% endif %}
+									</td>
+								{% endif %}
+							{% endfor %}
+							<td>
+								<a href="/this_message/{{message.id}}" class="btn btn-primary">Open</a>
+							</td>
+							<td>
+								<a id="button_control" href="/archive_message/{{ message.id }}/{{ message.in_trash }}/" class="btn btn-primary">Archive</a>
+							</td>
+						</tr>
+					{% endif %}
+				{% endfor %}
+			</tbody>
+		</table>
+	</form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>ToolShare</title>
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	<script language="JavaScript" type="text/javascript">
+	function showhidediv(rad) {
+		var rads = document.getElementsByName( rad.name );
+		var chooseSZ = document.getElementById('choose');
+		var createSZ = document.getElementById('create');
+		chooseSZ.style.display = (rads[0].checked) ? 'block' : 'none';
+		createSZ.style.display = (rads[1].checked) ? 'block' : 'none';
+	}
+
+	function enable(element_id) {
+		document.getElementById(element_id).disabled = false;
+	}
+
+	function disable(element_id) {
+		document.getElementById(element_id).disabled = true;
+	}
+	
+	function isNumberKey(evt){
+		var charCode = (evt.which) ? evt.which : event.keyCode
+		if (charCode > 31 && (charCode < 48 || charCode > 57))
+			return false;
+		return true;
+	}    
+	</script>
+
+	<style type="text/css">
+		body{
+			background: #e0e0e0;
+			padding-top: 50px;
+		}
+		.registration{
+			margin: 0 auto;
+			padding: 15px 40px 30px 40px;
+			background: white;
+			width: 71%;
+		}
+		
+		#nav-item {
+			color: #E0E0E0;
+			padding-left: 20px;
+		}
+		
+		#nav-item:hover { 
+			color: white;
+		}
+		
+		#test {
+			text-color: white;
+		}
+	</style>
+</head>
+<body>
+	<nav id="myNavbar" class="navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbarCollapse">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" id="nav-item" href="http://127.0.0.1:8000/home/">ToolShare</a>
+			</div>
+		</div>
+	</nav>
+	<div class="registration">
+	   <form action="/registration_auth/" method="post">
+			<font size="2"><i>Fields marked with (*) are required.</i></font>
+			<br>
+			<br>
+			<font size="5"><strong>Personal Information</strong></font>
+			<br>
+			<br>
+			{% csrf_token %}
+			<div class="form-inline">
+				<label for="username" class="col-sm-2 control-label">Username*</label>
+				<div class="col-sm10">
+					<input value="{{username_input}}" maxlength="20" size="25" class="form-control" name="username" id="username" placeholder="(at least 4 letters/numbers)" required pattern="[a-zA-Z0-9]+.{3,20}">
+					{% if error_message|length != 0 and error_message == "Username is already taken."%}
+						&nbsp<font size="2"color="red"><i>{{ error_message }}</i></font>
+					{% endif %}
+					<!--<span class="input-group-addon"><i class="glyphicon glyphicon-ok form-control-feedback"></i></span> -->
+				</div>
+			</div>	
+			<br>
+			<div class="form-inline">
+				<label for="inputPassword" class="col-sm-2 control-label">Password*</label>
+				<div class="col-sm10">
+					<input type="password" maxlength="25" size="25" class="form-control" name="password" id="inputPassword" placeholder="(at least 6 letters/numbers)" required pattern="[a-zA-Z0-9]+.{5,25}">
+				</div>
+			</div>
+			<br>
+			<div class="form-inline">
+				<label for="inputEmail" class="col-sm-2 control-label">Email*</label>
+				<div class="col-sm10">
+					<input type="email" value="{{email_input}}" maxlength="25" size="25" class="form-control" name="email" id="inputEmail" required>
+				</div>
+			</div>
+			<br>
+			<div class="form-inline">
+				<label for="inputFirstName" class="col-sm-2 control-label">First Name*</label>
+				<div class="col-sm10">
+					<input value="{{first_name_input}}" maxlength="25" size="25" class="form-control" name="firstname" id="inputFirstName" required pattern="^[A-Z][a-z]*">
+				</div>
+			</div>
+			<br>
+			<div class="form-inline">
+				<label for="inputLastName" class="col-sm-2 control-label">Last Name*</label>
+				<div class="col-sm10">
+					<input value="{{last_name_input}}" maxlength="25" size="25" class="form-control" name="lastname" id="inputLastName" required pattern="^[A-Z][a-z]*">
+				</div>
+			</div>
+			<br>
+			<div class="form-inline">
+				<label for="inputPhoneNumber" class="col-sm-2 control-label">Phone Number*</label>
+				<div class="col-sm10">
+					<input type="tel" value="{{phonenumber_input}}" maxlength="10" size="10" class="form-control" onkeypress="return isNumberKey(event)" name="phonenumber" id="inputPhoneNumber" required pattern="[0-9]+">
+				</div>
+			</div>
+			<br>
+			<div class="form-inline">
+				<label for="inputStreet" class="col-sm-2 control-label">Street*</label>
+				<div class="col-sm10">
+					<input value="{{street_input}}" maxlength="25" size="25" class="form-control" name="street_address" id="inputStreet" required pattern="^[a-zA-Z0-9]+([\s][a-zA-Z0-9]+)*$">
+				</div>
+			</div>
+			<br>
+			<div class="form-inline">
+				<label for="inputCity" class="col-sm-2 control-label">City*</label>
+				<div class="col-sm10">
+					<input value="{{city_input}}" maxlength="15" size="15" class="form-control" name="city" id="inputCity" required pattern="^[A-Z][a-z]*">
+				</div>
+			</div>
+			<br>
+			<div class="form-inline">
+				<label for="inputState" class="col-sm-2 control-label">State*</label>
+				<select name="state" class="form-control input-md">
+					{% for state in list_of_states %}
+						{% if state == state_input %}
+							<option value={{state}} selected>{{state}}</option>
+						{% else %}
+							<option value={{state}}>{{state}}</option>
+						{% endif %}
+					{% endfor %}
+				</select>
+			</div>
+			<br>	
+			<div class="form-inline">
+				<label for="inputZipcode" class="col-sm-2 control-label">Zipcode*</label>
+				<div class="col-sm10">
+					<input value="{{zipcode_input}}" maxlength="5" size="5" class="form-control" name="zipcode" onkeypress="return isNumberKey(event)" id="inputZipcode" required pattern="[0-9]+.{4,}">
+				</div>
+			</div>
+			<br>
+			<div class="form-inline">
+				<label for="birthdate" class="col-sm-2 control-label">Birthdate*</label>
+				<div class="form-inline">
+					<div id="choose">
+						<select name="birthmonth" id="birthmonth_dropdown" class="form-control input-md">
+							{% for i in range_months %}
+								{% if i == selected_month %}
+									<option value={{i}} selected>{{i}}</option>
+								{% else %}
+									<option value={{i}}>{{i}}</option>
+								{% endif %}
+							{% endfor %}
+						</select>
+						<select name="birthday" id="birthday_dropdown" class="form-control input-md">
+							{% for i in range_days %}
+								{% if i == selected_day %}
+									<option value={{i}} selected>{{i}}</option>
+								{% else %}
+									<option value={{i}}>{{i}}</option>
+								{% endif %}
+							{% endfor %}
+						</select>
+						<select name="birthyear" id="birthyear_dropdown" class="form-control input-md">
+							{% for i in range_years %}
+								{% if i == selected_year %}
+									<option value={{i}} selected>{{i}}</option>
+								{% else %}
+									<option value={{i}}>{{i}}</option>
+								{% endif %}
+							{% endfor %}
+						</select>
+						{% if error_message|length != 0 and error_message == "Please select a valid date."%}
+							&nbsp<font size="2"color="red"><i>{{ error_message }}</i></font>
+						{% endif %}
+					</div>
+				</div>	
+			</div>
+
+			<br>
+			
+			<!--It would be nice to have a paragraph briefly explaining what a Share Zone is for the new user-->
+			<br>
+			<div><strong><font size="5">ShareZone</font></strong><i> (choose either)</i></div>
+			<br>
+			
+			
+			<input name="sz_radio" type="radio" value="choose" {% if share_zone_query_results|length == 0 %} disabled {% else %} checked {% endif %} onclick="{% if share_zone_query_results|length != 0 %} enable('shareZoneDropDown') {% endif %}; disable('inputShareZoneName')" />
+			<strong><i>Join Existing ShareZone</i></strong><br>
+			<br>
+			<div id="choose" class="col-sm-3">
+			<select id="shareZoneDropDown" class="form-control input-lg" name="ChosenShareZone" {% if share_zone_query_results|length == 0 %} disabled {% endif %}>
+				{% for share_zone in share_zone_query_results %}
+					{% if share_zone.id == chosen_sharezone_input %}
+						<option value={{share_zone.id}} selected>{{share_zone.name}} - {{share_zone.zipcode}}</option>
+					{% else %}
+						<option value={{share_zone.id}}>{{share_zone.name}} - {{share_zone.zipcode}}</option>
+					{% endif %}
+				{% endfor %}
+			</select>
+			</div>
+			<br>
+			<br>
+			<br>
+			<br>
+			<input name="sz_radio" type="radio" value="create" {% if share_zone_query_results|length == 0 %} checked {% else %} disable('inputShareZoneName') {% endif %} onclick="enable('inputShareZoneName'); {% if share_zone_query_results|length == 0 %} disable('shareZoneDropDown') {% endif %}"/>
+			<strong><i>Create Your Own ShareZone</i></strong><br>
+			<br>
+			<div id="create" class="form-inline">
+				<label for="inputShareZoneName" class="col-sm-2 control-label">ShareZone Name*</label>
+				<div class="col-sm10">
+					<input maxlength="25" size="30" class="form-control" name="ShareZoneName" id="inputShareZoneName" placeholder="(enter a new ShareZone name)" {% if share_zone_query_results|length != 0 %} disabled {% endif %} required pattern="^[a-zA-Z]+([\s][a-zA-Z]+)*$">
+					{% if error_message|length != 0 and error_message == "ShareZone name is already taken."%}
+						&nbsp<font size="2"color="red"><i>{{ error_message }}</i></font>
+					{% endif %}
+				</div>
+			</div>
+			<br>
+			<input type="submit" class="btn btn-primary" role="button" value="Register">
+		</form>
+	</div>
+</body>
+</html>                                             		

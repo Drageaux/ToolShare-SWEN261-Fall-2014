@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<style type="text/css">
+	body {
+		background: #e0e0e0;
+	}
+	
+	.available_tools, .borrowed_tools, .user_requests, .transactions{
+    	padding: 1px 30px 0px 30px;
+    }
+	
+	.user_info li {
+		list-style-type: none;
+	}
+	
+	.user_info h2, h3 {
+		margin-left: 30px;
+	}
+	
+	.user_info {
+		margin: 0;
+		padding: 0;
+	}
+	
+	.page-header {
+		margin: 30px;
+	}
+	
+	#toolHeader {
+		float: left;
+	}
+	
+	#content {
+		margin: 0 auto;
+		padding: 10px 20px 10px 20px;
+		width: 71%;
+		background: white;
+	}
+</style>
+<div id="content">
+	<div class = "user_info">
+		{% if tu.is_super_admin %}
+			<h1 class="page-header">{{tu.user.first_name}} {{tu.user.last_name}} (Super Admin)</h1>
+		{% elif tu.is_admin %}
+			<h1 class="page-header">{{tu.user.first_name}} {{tu.user.last_name}} (Admin)</h1>
+		{% else %}
+			<h1 class="page-header">{{tu.user.first_name}} {{tu.user.last_name}}</h1>
+		{% endif %}
+		<ul>
+			<li><strong>Birthday:</strong> {{tu.birth_date}}</li>
+			<li><strong>Email:</strong> {{tu.user.email}}</li>
+			<li><strong>Phone:</strong> {{tu.phone_number}}</li>
+			<li><strong>Address:</strong> {{tu.street}}, {{tu.city}}, {{tu.state}}</li>
+			<li><strong>Zipcode:</strong> {{tu.zipcode}}</li>
+			
+			{% if tuser.is_admin and not tu.is_super_admin %}
+				<li><a href="/decline_user/{{tu.user.id}}">Deactivate this user</a></li>
+				<li><a href="/inactive_user/{{tu.user.id}}">Activate this user</a></li>
+				<li><a href="/make_admin/{{tu.user.id}}">Make this user an Admin</a></li>
+			{% endif %}
+			{% if tuser.is_super_admin %}
+				<li><a href="/decline_user/{{tu.user.id}}">Deactivate this user</a></li>
+				<li><a href="/inactive_user/{{tu.user.id}}">Activate this user</a></li>
+				<li><a href="/make_admin/{{tu.user.id}}">Make this user an Admin</a></li>
+				<li><a href="/make_super_admin/{{tu.user.id}}">Make this user a SuperAdmin</a></li>
+			{% endif %}
+		
+		</ul>
+	</div>
+	<div class="available_tools">
+		<h2>Available Tools</h2>
+		<table class="table table-striped" data-toggle="table" data-pagination="true">
+			<thead>
+				<tr>
+					<th>Tool</th>
+					<th>Condition</th>
+					<th>Description</th>
+					<th>Current User</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for tool in tool_query_results %}
+					{% if tool.owner_id == tu.id and tool.is_active %}
+						<tr>
+							<td><a href="/tool/{{tool.id}}">{{ tool.name }}</a> {% if tool.is_in_shed %} (Shared in Shed) {% endif %}</td>
+							<td>
+								{% if tool.condition == "5" %}New
+								{% elif tool.condition == "4" %}Good
+								{% elif tool.condition == "3" %}Average
+								{% elif tool.condition == "2" %}Worn
+								{% elif tool.condition == "1" %}Damaged
+								{% elif tool.condition == "0" %}Destroyed	
+								{% endif %}
+							</td>
+							<td>{{ tool.description }}</td>
+							{% if tool.current_user_id == tuser.id %}
+								<td><a href="/user/{{tool.current_user.user.id}}">{{tool.current_user.user.first_name}} {{tool.current_user.user.last_name}}</a> (Me)</td>
+							{% else %}
+								<td><a href="/user/{{tool.current_user.user.id}}">{{tool.current_user.user.first_name}} {{tool.current_user.user.last_name}}</a></td>
+							{% endif %}
+						</tr>
+					{% endif %}
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+	<div class="borrowed_tools">
+		<h2>Borrowed Tools</h2>
+		<table class="table table-striped" data-toggle="table" data-pagination="true">
+			<thead>
+				<tr>
+					<th>Tool</th>
+					<th>Condition</th>
+					<th>Description</th>
+					<th>Owner</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for tool in tool_query_results %}
+					{% if not tool.owner_id == tool.current_user_id and tool.current_user_id == tuser.id %}
+						<tr>
+							<td><a href="/tool/{{tool.id}}">{{ tool.name }}</a></td>
+							<td>
+								{% if tool.condition == "5" %}New
+								{% elif tool.condition == "4" %}Good
+								{% elif tool.condition == "3" %}Average
+								{% elif tool.condition == "2" %}Worn
+								{% elif tool.condition == "1" %}Damaged
+								{% elif tool.condition == "0" %}Destroyed	
+								{% endif %}
+							</td>
+							<td>{{ tool.description }}</td>
+							{% if tool.current_user_id == tuser.id %}
+								<td><a href="/user/{{tool.owner.user.id}}">{{tool.current_user.user.first_name}} {{tool.current_user.user.last_name}}</a> (Me)</td>
+							{% else %}
+								<td><a href="/user/{{tool.owner.user.id}}">{{tool.current_user.user.first_name}} {{tool.current_user.user.last_name}}</a></td>
+							{% endif %}
+						</tr>
+					{% endif %}
+				{% endfor %}
+			</tbody>
+		</table>
+		<br>
+	</div>
+</div>
+{% endblock %}

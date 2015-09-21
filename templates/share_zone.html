@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+
+{% block title %}My ShareZone{% endblock %}
+
+{% block content %}
+<style type="text/css">
+	body {
+		background: #e0e0e0;
+	}
+	
+
+	#editShedButton {
+		float: right;
+		padding-top: 20px;
+	}
+
+	.shed_list, .make_shed, .transactions {
+		margin: 0 auto;
+		padding: 20px 40px 20px 40px;
+		width: 71%;
+		background: white;
+    }
+	
+	.member_list {
+		margin: 0 auto;
+		padding: 20px 40px 00px 40px;
+		width: 71%;
+		background: white;
+	}
+	
+	#shedHeader {
+		float: left;
+	}
+</style>
+<div class="member_list">
+	<h2>Members</h2>
+    <table class="table table-striped" data-toggle="table" data-pagination="true">
+        <thead>
+            <tr>
+                <th>Member</th>
+                <!--<th>Rating</th>-->
+				<th>Zipcode</th>
+            </tr>
+        </thead>
+        <tbody>
+			{% for tuser in user_query_results %}
+				{% if tuser.share_zone_id == sharezone.id and tuser.is_active %}
+					<tr>
+						{% if tuser.id == id %}
+							<td><a href="/user/{{tuser.user.id}}">{{tuser.user.first_name}} {{tuser.user.last_name}}</a> (Me)</td>
+						{% else %}
+							<td><a href="/user/{{tuser.user.id}}">{{tuser.user.first_name}} {{tuser.user.last_name}}</a></td>
+						{% endif %}
+						<!--<td>{{tuser.user.rating}}</td>-->
+						<td>{{tuser.zipcode}}</td>
+					</tr>
+				{% endif %}
+			{% endfor %}
+        </tbody>
+    </table>
+</div>
+{% if sharezone.has_shed == False %}
+	{% if tuser.is_admin == True %}
+		<div class="make_shed">
+			<form action="/shed_creation/" method="post">
+				{% csrf_token %}
+				<h2> Make a Shed</h2>
+				<br>
+				<div class="form-inline">
+					<label for="inputmaxnum" class="col-sm-2 control-label">Max Number of Tools*</label>
+					<div class="col-sm10">
+						<input type="maxnum" value="" maxlength="3" class="form-control" name="maxnum" onkeypress="return isNumberKey(event)" id="maxnum" placeholder="Max Number of Tools" required pattern="[0-9]*">
+					</div>
+				</div>
+				<br>
+				<div class="form-inline">
+					<label for="inputAddress" class="col-sm-2 control-label">Address*</label>
+					<div class="col-sm10">
+						<input type="address" value="{{address_input}}" maxlength="100" size="35" class="form-control" name="address" id="inputAddress" placeholder="Address (maximum 100 characters)" required pattern="^[a-zA-Z0-9]+([\s][a-zA-Z0-9]+)*$">
+					</div>
+				</div>
+				<br>
+				<script>
+					function isNumberKey(evt){
+						var charCode = (evt.which) ? evt.which : event.keyCode
+						if (charCode > 31 && (charCode < 48 || charCode > 57))
+							return false;
+						return true;
+					}    
+				</script>
+					
+				<input type="submit" class="btn btn-primary" role="button" value="Submit">
+			</form>
+		</div>
+	{% else %}
+		<div class="shed_list">
+			<h2>Shed</h2>
+			<font size="2"><i>There is no Shed in this ShareZone yet.</i></font>
+		</div>
+	{% endif%} 
+{% else %}
+	<div class="shed_list">
+		<h2 id="shedHeader">Shed</h2>
+		{% if tuser.is_admin == True %}
+			<form action="/edit_shed/" method="post">
+				<div>
+					<button class="btn btn-primary" id="editShedButton" role="button" name="editshed" value="{{shed.id}}">Edit Shed</button>
+				</div>
+			</form>
+		{% endif %}
+	    <table class="table table-striped" data-toggle="table" data-pagination="true">
+			<thead>
+				<tr>
+					<th>Tool</th>
+					<th>Owner</th>
+					<!--<th>Rating</th>-->
+					<th>Condition</th>
+					<th>Status</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for tool in tool_query_results %}
+					{% if tool.owner.share_zone_id == sharezone.id and tool.is_in_shed %}
+					<tr>	
+						<td><a href="/tool/{{tool.id}}">{{tool.name}}<a></td>
+						{% if tool.owner_id == id %}
+							<td><a href="/user/{{tool.owner_id}}">{{tool.owner.user.first_name}} {{tool.owner.user.last_name}}</a> (Me)</td>
+						{% else %}
+							<td><a href="/user/{{tool.owner_id}}">{{tool.owner.user.first_name}} {{tool.owner.user.last_name}}</a></td>
+						{% endif %}
+						<!--<td>{{tool.rating}}</td>-->
+						<td>
+							{% if tool.condition == "5" %}New
+							{% elif tool.condition == "4" %}Good
+							{% elif tool.condition == "3" %}Average
+							{% elif tool.condition == "2" %}Worn
+							{% elif tool.condition == "1" %}Damaged
+							{% elif tool.condition == "0" %}Destroyed	
+							{% endif %}
+						</td>
+						{% if tool.is_available %}
+							<td>Available</td>
+						{% else %}
+							<td>Unavailable</td>
+						{% endif %}
+					</tr>
+					{% endif %}
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+{% endif %}
+<!--
+<div class="transactions">
+	<h2 id="toolHeader">Transactions</h2>
+	<table class="table table-striped" data-toggle="table" data-pagination="true">
+		<thead>
+			<tr>
+				<th>Event</th>
+				<th>Rating</th>
+				<th>Description</th>
+				<th>Start Date</th>
+				<th>End Date</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for transaction in transaction_query_results %}
+				{% if transaction.returned == True and tuser.share_zone_id == transaction.shed_id %}
+					<tr>
+						<td>
+							{% for user in user_query_results %}
+								{% if user.id == transaction.borrower_id %}
+									<a href="/user/{{user.id}}">{{user.user.first_name}} {{user.user.last_name}}</a>
+								{% endif %}
+							{% endfor %}
+							
+							borrowed 
+							<a href="/tool/{{transaction.tool_id}}">
+								{% for tool in tool_query_results%}
+									{% if tool.id == transaction.tool_id %}
+										{{ tool.name }}
+									{% endif %}
+								{% endfor %}
+							</a> 
+							from 
+							
+							{% for user in user_query_results %}
+								{% if user.id == transaction.owner_id %}
+									<a href="/user/{{user.id}}">{{user.user.first_name}} {{user.user.last_name}}</a>.
+								{% endif %}
+							{% endfor %}
+						</td>
+						<td>{{ transaction.rating}} </td>
+						<td>{{ transaction.description }}</td>
+						<td>{{ transaction.start_date }}</td>
+						<td>{{ transaction.end_date }}</td>
+					</tr>
+				{% endif %}
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+-->
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Shed{% endblock %}
+
+{% block content %}
+<style type="text/css">
+    body {
+		background: #e0e0e0;
+	}
+	
+	.shed_edit{
+    	margin: 0 auto;
+		padding: 20px;
+		width: 80%;
+		background: white;
+    }
+	
+	#save_button {
+		margin-left: 15px;
+	}
+</style>
+<div class="shed_edit">
+	<form action="/edit_tool_auth/{{tool.id}}" method="post">
+		{% csrf_token %}
+		<div class="form-inline">
+			<label for="shed_location" class="col-sm-2 control-label">Shed Address</label>
+			<div class="col-sm10">
+				<input value="{{shed.address}}" type="shed_location" maxlength="20" class="form-control" name="shed_location" id="shed_location" placeholder="Address" required >
+			</div>
+		</div>
+		<br>
+		<div class="form-inline">
+			<label for="shed_max" class="col-sm-2 control-label">Max Number of Tools </label>
+			<div class="col-sm10">
+				<input value="{{shed.max_num_tools}}" type="shed_max" maxlength="25" class="form-control" name="shed_max" id="shed_max" placeholder=". . .">
+			</div>
+		</div>
+		<br>
+		<input type="submit" class="btn btn-primary" id="save_button" role="button" value="Save">
+	</form>
+</div>
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}Tool{% endblock %}
+
+{% block content %}
+<style type="text/css">
+	body {
+		background: #e0e0e0;
+	}
+	
+	.tool_display, .tool_transaction{
+    	margin: 40px;
+    }
+	
+	.content {
+		margin: 0 auto;
+		padding: 10px 20px 10px 20px;
+		width: 71%;
+		background: white;
+	}
+	
+	#add_shed_button, #remove_shed_button, #borrow_button, #request_button, #return_button, #edit_tool_button {
+		margin-left: 15px;
+	}
+</style>
+<div class="content">
+	<div class="tool_display">
+		<div class="form-inline">
+			<div class="col-sm3">
+				<label for="toolname" class="col-sm-2 control-label">Tool Name: </label>
+				{{this_tool.name}}
+			</div>
+		</div>
+		<br>
+		<div class="form-inline">
+			<div class="col-sm3">
+				<label for="owner" class="col-sm-2 control-label">Owner: </label>
+				<a href="/user/{{owner.id}}">{{owner.first_name}} {{owner.last_name}}</a>
+			</div>
+		</div>
+		<br>
+		<div class="form-inline">
+		  <div class="col-sm3">
+				<label for="description" class="col-sm-2 control-label">Description: </label>
+				{% if this_tool.description != "" %}
+					{{this_tool.description}}
+				{% else %}
+					N/A
+				{% endif %}
+		  </div>
+		</div>
+		<br>
+		<div class="form-inline">
+			<div class="col-sm3">
+				<label for="modelnumber" class="col-sm-2 control-label">Model Number: </label>
+				{% if this_tool.model_number != "" %}
+					{{this_tool.model_number}}
+				{% else %}
+					N/A
+				{% endif %}
+			</div>
+		</div>
+		<br>
+		<div class="form-inline">
+			<div class="col-sm3">
+				<label for="condition" class="col-sm-2 control-label">Condition: </label>
+				{{this_tool.condition}}
+			</div>
+		</div>
+		<br>
+		<div class="form-inline">
+			<div class="col-sm3">
+				<label for="powertool" class="col-sm-2 control-label">Power Tool: <span title="The use of Power Tools are limited to users of age 10 and above." class="glyphicon glyphicon-question-sign" aria-hidden="false"></span></label>
+				{% if this_tool.is_power_tool %}
+					Yes
+				{% else %}
+					No
+				{% endif %}
+			</div>
+		</div>
+	</div>
+
+	<div class="tool_transaction">
+		{% if this_tool.owner_id != my_id %}
+			{% if this_tool.is_power_tool == False or tuser_age >= 10 %}
+				{% if this_tool.is_available and this_tool.is_in_shed %}
+					<form action="/borrow_tool/" method="post">
+						{% csrf_token %}
+						<button class="btn btn-primary" id="borrow_button" role="button" name="borrowtool" value="{{this_tool.id}}">Borrow</button>
+					</form>
+				{% elif this_tool.is_available and this_tool.is_in_shed == False and can_request == True %}
+					<form action="/request_tool/" method="post">
+						{% csrf_token %}
+						<button class="btn btn-primary" id="request_button" role="button" name="requesttool" value="{{this_tool.id}}">Request</button>
+					</form>
+				{% elif this_tool.is_available == False and this_tool.current_user.id == my_id %}
+					<form action="/return_tool/" method="post">
+						{% csrf_token %}
+						<button class="btn btn-primary" id="return_button" role="button" name="returntool" value="{{this_tool.id}}">Return</button>
+					</form>
+				{% else %}
+					<font size="2"><i>No action available for this Tool.</i></font>
+				{% endif %}
+			{% else %}
+				<font size="2"><i>No action available for this Tool.</i></font>
+			{% endif %}
+		{% else %}
+			{% if this_tool.is_available %}
+				{% if this_tool.is_in_shed %}
+					<form action="/remove_from_shed/" method="post">
+						{% csrf_token %}
+						<button class="btn btn-primary" id="remove_shed_button" role="button" name="removetool" value="{{this_tool.id}}">Remove from Shed</button>
+					</form>
+				{% else %}
+					<form action="/add_to_shed/" method="post">
+						{% csrf_token %}
+						<button class="btn btn-primary" id="add_shed_button" role="button" name="addtool" value="{{this_tool.id}}">Add to Shed</button>
+					</form>
+					<br>
+					<form action="/edit_tool/" method="post">
+						{% csrf_token %}
+						<button class="btn btn-primary" id="edit_tool_button" role="button" name="edittool" value="{{this_tool.id}}">Edit Tool</button>
+					</form>
+					<br>
+					<form action="/deregister_tool/" method="post">
+						{% csrf_token %}
+						<button class="btn btn-primary" id="add_shed_button" role="button" name="deregistertool" value="{{this_tool.id}}">Delete Tool</button>
+					</form
+				{% endif %}
+			{% else %}
+				<font size="2"><i>No action available for this Tool.</i></font>
+			{% endif %}
+		{% endif %}
+	</div>
+</div>
+
+
+{% endblock %}

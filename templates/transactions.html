@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block title %}Transactions{% endblock %}
+
+{% block content %}
+<style type="text/css">
+	body {
+		background: #e0e0e0;
+	}
+	
+	.borrow_requests, .my_transactions, .share_zone_transactions {
+		margin: 0 auto;
+		padding: 20px 40px 20px 40px;
+		width: 71%;
+		background: white;
+	}	
+</style>
+{% if borrow_requests|length != 0%}
+	<div class="borrow_requests">
+		<h2>Requests <font size="2"><span title="Someone wants to borrow your tools. Decide whether or not to lend them away." class="glyphicon glyphicon-info-sign" aria-hidden="false"></span></font></h2>
+		<table id="table" class="table table-striped" data-toggle="table" data-pagination="true">
+			<thead>
+				<tr>
+					<th data-valign="middle">Borrower</th>
+					<th data-valign="middle">Tool</th>
+					<th class="col-md-1"></th>
+					<th class="col-md-1"></th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for request in borrow_requests %}
+					<tr>
+						{% for user in user_query_results %}
+							{% if user.id == request.requester_id %}
+								<td><a href="http://127.0.0.1:8000/user/{{request.requester_id}}">{{user.user.first_name}} {{user.user.last_name}}</a></td>
+							{% endif %}
+						{% endfor %}
+						{% for tool in tool_query_results %}
+							{% if tool.id == request.tool_id %}
+								<td><a href="http://127.0.0.1:8000/tool/{{request.tool_id}}">{{tool.name}}</a></td>
+							{% endif %}
+						{% endfor %}
+						
+						<td><a href="/accept_borrow_request/{{request.id}}"><button class="btn btn-primary"><span class="glyphicon glyphicon-ok"> <font face="arial">Accept</font></span></button></a></td>
+						<td><a href="/decline_borrow_request/{{request.id}}"><button class="btn btn-primary"><span class="glyphicon glyphicon-remove"> <font face="arial">Decline</font></span></button></a></td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+{% endif %}
+
+<div class="my_transactions">
+	<h2>My History</h2>
+	<table class="table table-striped" data-toggle="table" data-pagination="true">
+		<thead>
+			<tr>
+				<th>Event</th>
+				<th>Location</th>
+				<th>Rating</th>
+				<th>Description</th>
+				<th>Start Date</th>
+				<th>End Date</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for transaction in transaction_query_results %}
+				{% if transaction.owner_id == tuser.id or transaction.borrower_id == tuser.id %}
+					{% if transaction.returned == True %}
+						<tr>
+							<td>
+								{% for user in user_query_results %}
+									{% if user.id == transaction.borrower_id %}
+										{% if tuser.id == transaction.borrower_id %}
+											You
+										{% else %}
+											<a href="/user/{{user.id}}">{{user.user.first_name}} {{user.user.last_name}}</a>
+										{% endif %}
+									{% endif %}
+								{% endfor %}
+								
+								borrowed 
+								<a href="/tool/{{transaction.tool_id}}">
+									{% for tool in tool_query_results%}
+										{% if tool.id == transaction.tool_id %}
+											{{ tool.name }}
+										{% endif %}
+									{% endfor %}
+								</a> 
+								from 
+								
+								{% for user in user_query_results %}
+									{% if user.id == transaction.owner_id %}
+										{% if tuser.id == transaction.owner_id %}
+										you.
+										{% else %}
+										<a href="/user/{{user.id}}">{{user.user.first_name}} {{user.user.last_name}}</a>
+										{% endif %}
+									{% endif %}
+								{% endfor %}
+							</td>
+							<td>{% if transaction.shed_id != None %} Shed {% else %} Home {% endif %}</td>
+							<td>{{ transaction.rating }} </td>
+							<td>{{ transaction.description }}</td>
+							<td>{{ transaction.start_date }}</td>
+							<td>{{ transaction.end_date }}</td>
+						</tr>
+					{% endif %}
+				{% endif %}
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+<div class="share_zone_transactions">
+	<h2>ShareZone Transaction History</h2>
+	<table class="table table-striped" data-toggle="table" data-pagination="true">
+		<thead>
+			<tr>
+				<th>Event</th>
+				<th>Rating</th>
+				<th>Description</th>
+				<th>Start Date</th>
+				<th>End Date</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for transaction in transaction_query_results %}
+				{% if transaction.returned == True and tuser.share_zone_id == transaction.shed_id %}
+					<tr>
+						<td>
+							{% for user in user_query_results %}
+								{% if user.id == transaction.borrower_id %}
+									<a href="/user/{{user.id}}">{{user.user.first_name}} {{user.user.last_name}}</a>
+								{% endif %}
+							{% endfor %}
+							
+							borrowed 
+							<a href="/tool/{{transaction.tool_id}}">
+								{% for tool in tool_query_results%}
+									{% if tool.id == transaction.tool_id %}
+										{{ tool.name }}
+									{% endif %}
+								{% endfor %}
+							</a> 
+							from 
+							
+							{% for user in user_query_results %}
+								{% if user.id == transaction.owner_id %}
+									<a href="/user/{{user.id}}">{{user.user.first_name}} {{user.user.last_name}}</a>.
+								{% endif %}
+							{% endfor %}
+						</td>
+						<td>{{ transaction.rating}} </td>
+						<td>{{ transaction.description }}</td>
+						<td>{{ transaction.start_date }}</td>
+						<td>{{ transaction.end_date }}</td>
+					</tr>
+				{% endif %}
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+{% endblock %}
